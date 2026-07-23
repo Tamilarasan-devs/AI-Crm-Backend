@@ -21,6 +21,7 @@ const createLead = async (req, res, next) => {
     }
 
     req.body.userId = req.tenantId;
+    req.body.createdByName = req.user?.name || 'System';
     const lead = await Lead.create(req.body);
     res.status(201).json(new ApiResponse(201, lead, 'Lead created successfully'));
   } catch (error) {
@@ -30,6 +31,29 @@ const createLead = async (req, res, next) => {
 
 const getLeads = async (req, res, next) => {
   try {
+    if (req.query.page || req.query.limit) {
+      const page = parseInt(req.query.page, 10) || 1;
+      const limit = parseInt(req.query.limit, 10) || 10;
+      const offset = (page - 1) * limit;
+
+      const { count, rows } = await Lead.findAndCountAll({
+        where: { userId: req.tenantId },
+        order: [['createdAt', 'DESC']],
+        limit,
+        offset
+      });
+
+      return res.status(200).json(new ApiResponse(200, {
+        leads: rows,
+        pagination: {
+          total: count,
+          page,
+          limit,
+          totalPages: Math.ceil(count / limit)
+        }
+      }, 'Leads fetched successfully'));
+    }
+
     const leads = await Lead.findAll({ 
       where: { userId: req.tenantId },
       order: [['createdAt', 'DESC']] 

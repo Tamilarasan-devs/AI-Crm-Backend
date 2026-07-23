@@ -11,14 +11,18 @@ const app = express();
 
 // Global Middlewares
 app.use(helmet());
-app.use(cors({
+const corsOptions = {
   origin: [
     'https://ai-crm-frontend-sandy.vercel.app',
     'http://localhost:5173',
     'http://localhost:3000'
   ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
-}));
+};
+
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: true, limit: '16kb' }));
 app.use(morgan('dev'));

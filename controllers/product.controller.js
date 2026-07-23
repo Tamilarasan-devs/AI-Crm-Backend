@@ -43,6 +43,29 @@ const createProduct = async (req, res, next) => {
 
 const getProducts = async (req, res, next) => {
   try {
+    if (req.query.page || req.query.limit) {
+      const page = parseInt(req.query.page, 10) || 1;
+      const limit = parseInt(req.query.limit, 10) || 10;
+      const offset = (page - 1) * limit;
+
+      const { count, rows } = await Product.findAndCountAll({
+        where: { userId: req.tenantId },
+        order: [['createdAt', 'DESC']],
+        limit,
+        offset
+      });
+
+      return res.status(200).json(new ApiResponse(200, {
+        products: rows,
+        pagination: {
+          total: count,
+          page,
+          limit,
+          totalPages: Math.ceil(count / limit)
+        }
+      }, 'Products fetched successfully'));
+    }
+
     const products = await Product.findAll({
       where: { userId: req.tenantId },
       order: [['createdAt', 'DESC']]

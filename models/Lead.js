@@ -56,6 +56,11 @@ const Lead = sequelize.define('Lead', {
       model: 'Users',
       key: 'id'
     }
+  },
+  createdByName: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: 'System'
   }
 }, {
   timestamps: true,

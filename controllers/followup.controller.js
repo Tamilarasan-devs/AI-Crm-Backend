@@ -16,6 +16,7 @@ const createFollowUp = async (req, res, next) => {
       time,
       method,
       notes,
+      createdByName: req.user?.name || 'System',
     });
 
     res.status(201).json(new ApiResponse(201, followUp, 'Follow-up scheduled successfully'));
@@ -60,8 +61,26 @@ const updateFollowUpStatus = async (req, res, next) => {
   }
 };
 
+const deleteFollowUp = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const followUp = await FollowUp.findOne({
+      where: { id },
+      include: [{ model: Lead, where: { userId: req.tenantId }, attributes: [] }]
+    });
+    if (!followUp) throw new ApiError(404, 'Follow-up not found');
+    
+    await followUp.destroy();
+    
+    res.status(200).json(new ApiResponse(200, null, 'Follow-up deleted successfully'));
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createFollowUp,
   getAllFollowUps,
-  updateFollowUpStatus
+  updateFollowUpStatus,
+  deleteFollowUp,
 };

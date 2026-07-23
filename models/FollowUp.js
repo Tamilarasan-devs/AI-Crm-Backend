@@ -26,6 +26,11 @@ const FollowUp = sequelize.define('FollowUp', {
   status: {
     type: DataTypes.ENUM('Pending', 'Completed', 'Cancelled'),
     defaultValue: 'Pending',
+  },
+  createdByName: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: 'System'
   }
 }, {
   timestamps: true,
