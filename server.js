@@ -25,9 +25,23 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// Routes Placeholder
-app.get('/api/v1/health', (req, res) => {
-  res.status(200).json({ status: 'success', message: 'API is running' });
+app.get('/api/v1/health', async (req, res) => {
+  try {
+    await sequelize.authenticate();
+    res.status(200).json({ 
+      status: 'success', 
+      message: 'API is running',
+      database: 'connected',
+      timestamp: new Date()
+    });
+  } catch (error) {
+    res.status(503).json({ 
+      status: 'error', 
+      message: 'Database connection failed',
+      error: error.message,
+      timestamp: new Date()
+    });
+  }
 });
 
 const authRoutes = require('./routes/auth.routes');
