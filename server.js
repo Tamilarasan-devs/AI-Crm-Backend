@@ -35,7 +35,7 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 app.use('/api', limiter);
-
+//db
 app.get('/api/v1/health', async (req, res) => {
   try {
     await sequelize.authenticate();
