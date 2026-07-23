@@ -2,6 +2,7 @@ const User = require('../models/User');
 const { ApiError, ApiResponse } = require('../utils/apiResponse');
 const { generateAccessAndRefreshTokens } = require('../utils/generateTokens');
 const { Op } = require('sequelize');
+const crypto = require('crypto');
 
 const register = async (req, res, next) => {
   try {
@@ -22,7 +23,9 @@ const register = async (req, res, next) => {
       email,
       phone,
       password,
-      role
+      role: 'Admin', // The creator of a new account is the Owner/Admin of their workspace
+      permissions: ['dashboard', 'leads', 'products', 'employees', 'attendance', 'invoices', 'follow-ups'],
+      tenantId: crypto.randomUUID() // Create a new unique workspace ID for them
     });
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user);

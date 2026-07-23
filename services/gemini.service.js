@@ -30,6 +30,12 @@ const getDashboardInsights = async (promptText) => {
     return parsed;
   } catch (error) {
     console.error('Gemini API Error:', error);
+    
+    // Check if it's a quota/rate limit error
+    if (error.status === 429) {
+      throw new Error('You have reached your Gemini API usage limit. Please wait a few seconds and try again.');
+    }
+    
     throw new Error('Failed to generate insights from Gemini');
   }
 };
