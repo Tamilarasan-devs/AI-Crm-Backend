@@ -134,6 +134,12 @@ sequelize.authenticate()
     console.log('PostgreSQL Connection has been established successfully.');
     
     try {
+      console.log('Fixing broken tenantIds for existing users...');
+      await sequelize.query(`
+        UPDATE "Users" SET "tenantId" = NULL WHERE "tenantId" IS NOT NULL;
+      `);
+      console.log('TenantId fix successful.');
+
       console.log('Cleaning up duplicate SKUs to avoid unique constraint errors...');
       await sequelize.query(`
         DELETE FROM "Products"
@@ -147,9 +153,9 @@ sequelize.authenticate()
             WHERE t.row_num = 1
         );
       `);
-      console.log('Cleanup successful.');
+      console.log('SKU Cleanup successful.');
     } catch (err) {
-      console.warn('Cleanup failed (table might not exist yet):', err.message);
+      console.warn('DB Cleanup failed (table might not exist yet):', err.message);
     }
 
     // Note: Use { alter: true } in dev for auto-schema update
