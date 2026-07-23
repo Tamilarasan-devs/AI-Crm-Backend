@@ -24,8 +24,7 @@ const register = async (req, res, next) => {
       phone,
       password,
       role: 'Admin', // The creator of a new account is the Owner/Admin of their workspace
-      permissions: ['dashboard', 'leads', 'products', 'employees', 'attendance', 'invoices', 'follow-ups'],
-      tenantId: crypto.randomUUID() // Create a new unique workspace ID for them
+      permissions: ['dashboard', 'leads', 'products', 'employees', 'attendance', 'invoices', 'follow-ups']
     });
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user);
