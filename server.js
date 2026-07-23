@@ -132,7 +132,7 @@ Attendance.belongsTo(User, { foreignKey: 'userId' });
 sequelize.authenticate()
   .then(() => {
     console.log('PostgreSQL Connection has been established successfully.');
-    // Note: Use { alter: true } in dev for auto-schema updates
+    // Note: Use { alter: true } in dev for auto-schema update
     return sequelize.sync({ alter: process.env.NODE_ENV === 'development' });
   })
   .then(() => {
