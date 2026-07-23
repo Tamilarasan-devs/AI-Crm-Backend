@@ -130,8 +130,28 @@ Attendance.belongsTo(User, { foreignKey: 'userId' });
 
 // Database Sync & Server Start
 sequelize.authenticate()
-  .then(() => {
+  .then(async () => {
     console.log('PostgreSQL Connection has been established successfully.');
+    
+    try {
+      console.log('Cleaning up duplicate SKUs to avoid unique constraint errors...');
+      await sequelize.query(`
+        DELETE FROM "Products"
+        WHERE id NOT IN (
+            SELECT id
+            FROM (
+                SELECT id,
+                ROW_NUMBER() OVER( PARTITION BY sku ORDER BY "createdAt" DESC ) as row_num
+                FROM "Products"
+            ) t
+            WHERE t.row_num = 1
+        );
+      `);
+      console.log('Cleanup successful.');
+    } catch (err) {
+      console.warn('Cleanup failed (table might not exist yet):', err.message);
+    }
+
     // Note: Use { alter: true } in dev for auto-schema update
     return sequelize.sync({ alter: process.env.NODE_ENV === 'development' });
   })
