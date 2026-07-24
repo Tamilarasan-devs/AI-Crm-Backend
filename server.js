@@ -86,7 +86,7 @@ app.use('/api/v1/users', protect, userRoutes);
 // Error Handling Middleware (must be last)
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 
 // Setup Associations
 const Invoice = require('./models/Invoice');
