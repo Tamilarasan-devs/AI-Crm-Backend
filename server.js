@@ -1,4 +1,5 @@
 require('dotenv').config();
+const config = require('./config/env');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -6,6 +7,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const sequelize = require('./config/database');
 const errorHandler = require('./middlewares/errorHandler');
+const logger = require('./utils/logger');
 
 const app = express();
 
@@ -86,7 +88,7 @@ app.use('/api/v1/users', protect, userRoutes);
 // Error Handling Middleware (must be last)
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 8080;
+const PORT = config.port;
 
 // Setup Associations
 const Invoice = require('./models/Invoice');
@@ -131,16 +133,12 @@ Attendance.belongsTo(User, { foreignKey: 'userId' });
 // Database Sync & Server Start
 sequelize.authenticate()
   .then(async () => {
-    console.log('PostgreSQL Connection has been established successfully.');
+    logger.info('PostgreSQL Connection has been established successfully.');
     
     try {
-      console.log('Fixing broken tenantIds for existing users...');
-      await sequelize.query(`
-        UPDATE "Users" SET "tenantId" = NULL WHERE "tenantId" IS NOT NULL;
-      `);
-      console.log('TenantId fix successful.');
+      logger.info('Starting DB Sync checks...');
 
-      console.log('Cleaning up duplicate SKUs to avoid unique constraint errors...');
+      logger.info('Cleaning up duplicate SKUs to avoid unique constraint errors...');
       await sequelize.query(`
         DELETE FROM "Products"
         WHERE id NOT IN (
@@ -153,9 +151,9 @@ sequelize.authenticate()
             WHERE t.row_num = 1
         );
       `);
-      console.log('SKU Cleanup successful.');
+      logger.info('SKU Cleanup successful.');
     } catch (err) {
-      console.warn('DB Cleanup failed (table might not exist yet):', err.message);
+      logger.warn(`DB Cleanup failed (table might not exist yet): ${err.message}`);
     }
 
     // Note: Use { alter: true } in dev for auto-schema update
@@ -163,11 +161,11 @@ sequelize.authenticate()
   })
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      logger.info(`Server is running on port ${PORT}`);
     });
   })
   .catch((error) => {
-    console.error('Unable to connect to the database:', error);
+    logger.error('Unable to connect to the database:', error);
   });
 
 
