@@ -1,4 +1,6 @@
 const Employee = require('../models/Employee');
+const User = require('../models/User');
+const { Op } = require('sequelize');
 
 exports.createEmployee = async (req, res, next) => {
   try {
@@ -13,6 +15,31 @@ exports.createEmployee = async (req, res, next) => {
       status,
       userId: req.tenantId
     });
+
+    // Auto-create matching User (Sub-account) if they don't exist
+    let searchEmail = email;
+    if (!searchEmail) {
+      searchEmail = `${phone}@employee.local`; // Fallback since User requires email
+    }
+
+    const existingUser = await User.findOne({ 
+      where: { 
+        [Op.or]: [{ email: searchEmail }, { phone }]
+      } 
+    });
+
+    if (!existingUser) {
+      await User.create({
+        name,
+        email: searchEmail,
+        phone,
+        password: phone, // Default password is their phone number
+        role: 'Staff',
+        permissions: ['dashboard', 'attendance'], // Basic permissions
+        tenantId: req.tenantId
+      });
+    }
+
     res.status(201).json({ success: true, data: employee });
   } catch (error) {
     next(error);

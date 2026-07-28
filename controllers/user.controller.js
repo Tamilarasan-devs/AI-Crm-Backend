@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const Employee = require('../models/Employee');
+const { Op } = require('sequelize');
 const { ApiError, ApiResponse } = require('../utils/apiResponse');
 
 const createSubAccount = async (req, res, next) => {
@@ -24,6 +26,24 @@ const createSubAccount = async (req, res, next) => {
       permissions: permissions || [],
       tenantId: req.tenantId // Link this sub-account to the admin's tenant
     });
+
+    // Auto-create matching Employee if they don't exist
+    const existingEmployee = await Employee.findOne({ 
+      where: { 
+        [Op.or]: [{ email }, { phone }],
+        userId: req.tenantId
+      } 
+    });
+
+    if (!existingEmployee) {
+      await Employee.create({
+        name,
+        email,
+        phone,
+        designation: role || 'Staff',
+        userId: req.tenantId
+      });
+    }
 
     res.status(201).json(new ApiResponse(201, { id: subUser.id, name: subUser.name, email: subUser.email }, 'Sub-account created successfully'));
   } catch (error) {

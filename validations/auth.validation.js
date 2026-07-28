@@ -11,6 +11,8 @@ const registerSchema = z.object({
 const loginSchema = z.object({
   identifier: z.string().min(1, 'Email or Phone is required'),
   password: z.string().min(1, 'Password is required'),
+  latitude: z.union([z.string(), z.number()]).optional(),
+  longitude: z.union([z.string(), z.number()]).optional(),
 });
 
 const validate = (schema) => (req, res, next) => {

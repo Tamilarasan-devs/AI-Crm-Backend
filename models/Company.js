@@ -40,6 +40,14 @@ const Company = sequelize.define('Company', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  latitude: {
+    type: DataTypes.DECIMAL(10, 6),
+    allowNull: true,
+  },
+  longitude: {
+    type: DataTypes.DECIMAL(10, 6),
+    allowNull: true,
+  },
   userId: {
     type: DataTypes.UUID,
     allowNull: false,

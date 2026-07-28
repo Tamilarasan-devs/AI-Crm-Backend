@@ -24,7 +24,7 @@ const getCompanyProfile = async (req, res, next) => {
 
 const updateCompanyProfile = async (req, res, next) => {
   try {
-    const { companyName, email, phone, address, taxId, website } = req.body;
+    const { companyName, email, phone, address, taxId, website, latitude, longitude } = req.body;
     let company = await Company.findOne({ where: { userId: req.tenantId } });
 
     if (!company) {
@@ -50,6 +50,8 @@ const updateCompanyProfile = async (req, res, next) => {
     company.address = address !== undefined ? address : company.address;
     company.taxId = taxId !== undefined ? taxId : company.taxId;
     company.website = website !== undefined ? website : company.website;
+    company.latitude = latitude !== undefined ? (latitude === '' || latitude === 'null' ? null : latitude) : company.latitude;
+    company.longitude = longitude !== undefined ? (longitude === '' || longitude === 'null' ? null : longitude) : company.longitude;
 
     await company.save();
 

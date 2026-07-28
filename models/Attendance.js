@@ -27,9 +27,21 @@ const Attendance = sequelize.define('Attendance', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  latitude: {
+    type: DataTypes.DECIMAL(10, 6),
+    allowNull: true,
+  },
+  longitude: {
+    type: DataTypes.DECIMAL(10, 6),
+    allowNull: true,
+  },
+  distance: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+  },
   employeeId: {
     type: DataTypes.UUID,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: 'Employees',
       key: 'id'
