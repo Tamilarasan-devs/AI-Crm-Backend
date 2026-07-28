@@ -36,8 +36,11 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
 app.use('/api', limiter);
 //db
+
+
 app.get('/api/v1/health', async (req, res) => {
   try {
     await sequelize.authenticate();
@@ -56,6 +59,7 @@ app.get('/api/v1/health', async (req, res) => {
     });
   }
 });
+
 
 const authRoutes = require('./routes/auth.routes');
 const leadRoutes = require('./routes/lead.routes');
