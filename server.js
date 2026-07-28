@@ -133,7 +133,6 @@ Attendance.belongsTo(Employee, { foreignKey: 'employeeId' });
 
 User.hasMany(Attendance, { foreignKey: 'userId', onDelete: 'CASCADE' });
 Attendance.belongsTo(User, { foreignKey: 'userId' });
-
 // Database Sync & Server Start
 sequelize.authenticate()
   .then(async () => {
